@@ -90,21 +90,18 @@ class Bishop(Figure):
         num = 0
         for i in self.place:
             for j in coordinates:
+                if type(i) == str and type(j) == str and i is not j:
+                    index = letters.index(i) - letters.index(j)
                 if type(i) == int and type(j) == int and i != j:
                     if super()._is_not_out_of_range():
                         num = i - j
-                        print(num)
                     else:
                         return 'Its impossible to move Bishop like this'
-                else:
-                    return 'Its impossible to move Bishop like this'
-                if type(i) == str and type(j) == str and i is not j:
-                    index = letters.index(i) - letters.index(j)
-                else:
-                    return 'Its impossible to move Bishop like this'
+
                 if abs(index) == abs(num) and i != j:
-                    print(index, num)
                     return f'Its possible to move Bishop on {coordinates}'
+                elif abs(index) == abs(num) == 0:
+                    return 'Its impossible to move Bishop like this'
 
         return 'Its impossible to move Bishop like this'
 
@@ -144,9 +141,9 @@ print(rook.is_possible_to_move('F', 5))
 bishop = Bishop()
 print(bishop.set_color_for_figure())
 print(bishop.set_place_for_figure('E', 5))
-print(bishop.is_possible_to_move('F', 6))
+print(bishop.is_possible_to_move('F', 4))
 
 queen = Queen()
 print(queen.set_color_for_figure())
 print(queen.set_place_for_figure('E', 5))
-print(queen.is_possible_to_move('F', 3))
+print(queen.is_possible_to_move('F', 4))
