@@ -12,17 +12,19 @@ class Figure:
     def set_place_for_figure(self, *coordinates):
         self.place = coordinates
         for i in self.place:
-            if type(i) == int and self._is_not_out_of_range(i):
+            if type(i) == int and self._is_not_out_of_range():
                 return f'You moved figure to this {self.place} coordinates'
 
         return 'Please check if you typed your coordinates right'
 
-    def _is_not_out_of_range(self, value):
-        if 0 < value <= 7:
-            return True
-        elif 0 > value or value > 7:
-            return 'Please check if you typed your coordinates right'
-        return False
+    def _is_not_out_of_range(self):
+        for i in self.place:
+            if type(i) == int:
+                if 0 < i <= 7:
+                    return True
+                elif 0 > i or i > 7:
+                    return 'Please check if you typed your coordinates right'
+                return False
 
     def is_possible_to_move(self, *coordinates):
         ...
@@ -35,17 +37,17 @@ class Pawn(Figure):
                 if type(i) == str and type(j) == str and i != j:
                     return 'Its impossible to move this figure like this'
                 if type(i) == int and type(j) == int:
-                    if super()._is_not_out_of_range(j):
+                    if super()._is_not_out_of_range():
                         num = i - j
                         if num == 1 or num == -1:
                             if self.color == 'black' and num == 1:
-                                return f'Its possible to move on {coordinates}'
+                                return f'Its possible to move Pawn on {coordinates}'
                             elif self.color == 'white' and num == -1:
-                                return f'Its possible to move on {coordinates}'
+                                return f'Its possible to move Pawn on {coordinates}'
                         else:
-                            return 'Its impossible to move this figure like this'
+                            return 'Its impossible to move Pawn like this'
 
-        return 'Its impossible to move this figure like this'
+        return 'Its impossible to move Pawn like this'
 
 
 class Knight(Figure):
@@ -61,14 +63,14 @@ class Knight(Figure):
                     if a in index_check:
                         check_for_letter = 1
                 if type(i) == int and type(j) == int:
-                    if super()._is_not_out_of_range(j):
+                    if super()._is_not_out_of_range():
                         num = i - j
                         if num == 3 or num == -3:
                             check_for_number = 1
         if check_for_letter + check_for_number == 2:
-            return f'Its possible to move on {coordinates}'
+            return f'Its possible to move Knight on {coordinates}'
 
-        return 'Its impossible to move this figure like this'
+        return 'Its impossible to move Knight like this'
 
 
 class Rook(Figure):
@@ -76,9 +78,52 @@ class Rook(Figure):
         for i in self.place:
             for j in coordinates:
                 if i is j:
-                    return f'Its possible to move on {coordinates}'
+                    return f'Its possible to move Rook on {coordinates}'
 
-        return 'Its impossible to move this figure like this'
+        return 'Its impossible to move Rook like this'
+
+
+class Bishop(Figure):
+    def is_possible_to_move(self, *coordinates):
+        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+        index = 0
+        num = 0
+        for i in self.place:
+            for j in coordinates:
+                if type(i) == int and type(j) == int and i != j:
+                    if super()._is_not_out_of_range():
+                        num = i - j
+                        print(num)
+                    else:
+                        return 'Its impossible to move Bishop like this'
+                else:
+                    return 'Its impossible to move Bishop like this'
+                if type(i) == str and type(j) == str and i is not j:
+                    index = letters.index(i) - letters.index(j)
+                else:
+                    return 'Its impossible to move Bishop like this'
+                if abs(index) == abs(num) and i != j:
+                    print(index, num)
+                    return f'Its possible to move Bishop on {coordinates}'
+
+        return 'Its impossible to move Bishop like this'
+
+
+class Queen(Figure):
+    def is_possible_to_move(self, *coordinates):
+        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+        index = 0
+        num = 0
+        for i in self.place:
+            for j in coordinates:
+                if type(i) == int and type(j) == int:
+                    if super()._is_not_out_of_range():
+                        num = i - j
+                if type(i) == str and type(j) == str and i != j:
+                    index = letters.index(i) - letters.index(j)
+                if abs(index) == abs(num) or i == j:
+                    return f'Its possible to move Queen on {coordinates}'
+        return 'Its impossible to move Queen like this'
 
 
 pawn = Pawn()
@@ -95,3 +140,13 @@ rook = Rook()
 print(rook.set_color_for_figure())
 print(rook.set_place_for_figure('F', 4))
 print(rook.is_possible_to_move('F', 5))
+
+bishop = Bishop()
+print(bishop.set_color_for_figure())
+print(bishop.set_place_for_figure('E', 5))
+print(bishop.is_possible_to_move('F', 6))
+
+queen = Queen()
+print(queen.set_color_for_figure())
+print(queen.set_place_for_figure('E', 5))
+print(queen.is_possible_to_move('F', 3))
