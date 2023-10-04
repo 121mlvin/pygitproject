@@ -58,26 +58,30 @@ class Developer(Employee):
         return len(self.tech_stack) == len(other.tech_stack)
 
     def __add__(self, other):
-        name = self.name + other.name
+        biggest_salary = [self.salary_per_day, other.salary_per_day]
         for i in other.tech_stack:
             if i not in self.tech_stack:
                 self.tech_stack.append(i)
-        if super().__gt__(other):
-            return name, self.tech_stack, self.salary_per_day
-        return name, self.tech_stack, other.salary_per_day
+
+        return Developer(self.tech_stack, self.name + other.name, max(biggest_salary))
 
 
 recruiter = Recruiter('Max', 700)
 print(recruiter.work())
 print(recruiter)
 
-developer1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000)
-print(developer1)
-print(developer1 > recruiter)
-print(developer1.check_salary(22))
+developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000)
+print(developer_1)
+print(developer_1 > recruiter)
+print(developer_1.check_salary(22))
 
-developer2 = Developer(['JavaScript', 'Django', 'Linux'], 'Vasya', 1200)
-print(developer2)
-print(developer2 > developer1)
-print(developer2.check_salary(22))
-print(developer2.__add__(developer1))
+developer_2 = Developer(['JavaScript', 'Django', 'Linux'], 'Vasya', 1200)
+print(developer_2)
+print(developer_2 > developer_1)
+print(developer_2.check_salary(22))
+
+developer_3 = developer_2 + developer_1
+print(developer_3.salary_per_day)
+print(developer_3.name)
+print(developer_3.tech_stack)
+print(developer_3.check_salary(12))
