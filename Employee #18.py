@@ -1,4 +1,6 @@
 import traceback
+import urllib.request
+from urllib.request import urlopen
 from datetime import datetime
 from exceptions import EmailAlreadyExistsException
 
@@ -93,22 +95,76 @@ class Developer(Employee):
         return Developer(self.tech_stack, self.name + other.name, max(biggest_salary), self.email + other.email)
 
 
-recruiter = Recruiter('Max', 700, 'abc@mail')
-print(recruiter.work())
-print(recruiter)
+class Candidate:
+    def __init__(self, fist_name,
+                 last_name, email,
+                 tech_stack, main_skill,
+                 main_skill_grade):
+        self.fist_name = fist_name
+        self.last_name = last_name
+        self.email = email
+        self.tech_stack = tech_stack
+        self.main_skill = main_skill
+        self.main_skill_grade = main_skill_grade
 
-developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000, 'zxc@mail')
-print(developer_1)
-print(developer_1 > recruiter)
-print(developer_1.check_salary(22))
+    @property
+    def __str__(self):
+        return f'{self.fist_name} {self.last_name}'
 
-developer_2 = Developer(['JavaScript', 'Django', 'Linux'], 'Vasya', 1200, 'skrpow@mail')
-print(developer_2)
-print(developer_2 > developer_1)
-print(developer_2.check_salary(22))
+    @classmethod
+    def generate_candidates(cls, path_to_file):
+        lines = ''
+        with open(path_to_file, 'r') as f:
+            for i in f.read().splitlines():
+                lines += i
+                splited_lines = lines.split(',')
+                name, surname = splited_lines[0].split()
+                email = splited_lines[1]
+                tech_stack = splited_lines[2].split('|')
+                main_skill = splited_lines[3]
+                main_skill_grade = splited_lines[4]
+                lines = ''
 
-developer_3 = developer_2 + developer_1
-print(developer_3.salary_per_day)
-print(developer_3.name)
-print(developer_3.tech_stack)
-print(developer_3.check_salary(12))
+                return cls(fist_name=name, last_name=surname,
+                       email=email, tech_stack=tech_stack,
+                       main_skill=main_skill, main_skill_grade=main_skill_grade)
+
+
+# recruiter = Recruiter('Max', 700, 'abc@mail')
+# print(recruiter.work())
+# print(recruiter)
+#
+# developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000, 'zxc@mail')
+# print(developer_1)
+# print(developer_1 > recruiter)
+# print(developer_1.check_salary(22))
+#
+# developer_2 = Developer(['JavaScript', 'Django', 'Linux'], 'Vasya', 1200, 'skrpow@mail')
+# print(developer_2)
+# print(developer_2 > developer_1)
+# print(developer_2.check_salary(22))
+#
+# developer_3 = developer_2 + developer_1
+# print(developer_3.salary_per_day)
+# print(developer_3.name)
+# print(developer_3.tech_stack)
+# print(developer_3.check_salary(12))
+
+candidate1 = Candidate('Masha', 'Abc', 'ma@mail', ['JavaScript'], 'JavaScript', 'Junior')
+print(candidate1.fist_name)
+
+candidate2 = Candidate.generate_candidates('candidates.csv')
+print(candidate2.fist_name)
+print(candidate2.last_name)
+print(candidate2.email)
+print(candidate2.tech_stack)
+print(candidate2.main_skill)
+print(candidate2.main_skill_grade)
+
+candidate3 = Candidate.generate_candidates('candidates.csv')
+print(candidate3.fist_name)
+print(candidate3.last_name)
+print(candidate3.email)
+print(candidate3.tech_stack)
+print(candidate3.main_skill)
+print(candidate3.main_skill_grade)
