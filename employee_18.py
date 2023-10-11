@@ -1,6 +1,5 @@
 import traceback
 import urllib.request
-from urllib.request import urlopen
 from datetime import datetime
 from exceptions import EmailAlreadyExistsException
 
@@ -9,8 +8,9 @@ class Employee:
     def __init__(self, name, salary_per_day, email):
         self.name = name
         self.salary_per_day = salary_per_day
-        self.email = email
-        self.save_email()
+        if self.validate(email):
+            self.email = email
+            self.save_email()
 
     def work(self):
         return 'I come at the office'
@@ -38,18 +38,19 @@ class Employee:
 
     def save_email(self):
         with open('emails.csv', 'a+') as f:
-            if not self.validate():
-                pass
-            else:
-                f.write(self.email + '\n')
+            f.write(self.email + '\n')
 
-    def validate(self):
+    @staticmethod
+    def validate(email):
         current_date = datetime.now()
 
         try:
             with open('emails.csv', 'r') as f:
-                if self.email in f.read():
+                if email in f.read():
                     raise EmailAlreadyExistsException
+                else:
+                    print('Email saved!')
+
         except EmailAlreadyExistsException:
             print('Email already exists!')
             with open('logs.txt', 'a+') as logs:
@@ -108,29 +109,35 @@ class Candidate:
         self.main_skill_grade = main_skill_grade
 
     @property
-    def __str__(self):
+    def full_name(self):
         return f'{self.fist_name} {self.last_name}'
 
     @classmethod
     def generate_candidates(cls, path_to_file):
+
         lines = ''
-        with open(path_to_file, 'r') as f:
-            for i in f.read().splitlines():
-                lines += i
-                splited_lines = lines.split(',')
-                name, surname = splited_lines[0].split()
-                email = splited_lines[1]
-                tech_stack = splited_lines[2].split('|')
-                main_skill = splited_lines[3]
-                main_skill_grade = splited_lines[4]
+        candidates = []
+        file = urllib.request.urlopen(path_to_file)
+        for i in file:
+            decoded = i.decode('utf-8')
+            lines += decoded
+            splited_lines = lines.split(',')
+            if 'Full Name' in splited_lines:
                 lines = ''
+                continue
+            name, surname = splited_lines[0].split()
+            candidates.append(name)
+            candidates.append(surname)
+            candidates.append(splited_lines[1])
+            candidates.append(splited_lines[2].split('|'))
+            candidates.append(splited_lines[3])
+            candidates.append(splited_lines[4][:-1])
+            lines = ''
 
-                return cls(fist_name=name, last_name=surname,
-                       email=email, tech_stack=tech_stack,
-                       main_skill=main_skill, main_skill_grade=main_skill_grade)
+        return candidates
 
 
-# recruiter = Recruiter('Max', 700, 'abc@mail')
+# recruiter = Recruiter(name='Max', salary_per_day=700, email='abc@mail')
 # print(recruiter.work())
 # print(recruiter)
 #
@@ -151,20 +158,21 @@ class Candidate:
 # print(developer_3.check_salary(12))
 
 candidate1 = Candidate('Masha', 'Abc', 'ma@mail', ['JavaScript'], 'JavaScript', 'Junior')
-print(candidate1.fist_name)
+print(candidate1.full_name)
+#
+candidate2 = Candidate.generate_candidates(
+    'https://bitbucket.org/ivnukov/lesson2/raw/4f59074e6fbb552398f87636b5bf089a1618da0a/candidates.csv')
+print(candidate2)
+# print(candidate2.last_name)
+# print(candidate2.email)
+# print(candidate2.tech_stack)
+# print(candidate2.main_skill)
+# print(candidate2.main_skill_grade)
 
-candidate2 = Candidate.generate_candidates('candidates.csv')
-print(candidate2.fist_name)
-print(candidate2.last_name)
-print(candidate2.email)
-print(candidate2.tech_stack)
-print(candidate2.main_skill)
-print(candidate2.main_skill_grade)
-
-candidate3 = Candidate.generate_candidates('candidates.csv')
-print(candidate3.fist_name)
-print(candidate3.last_name)
-print(candidate3.email)
-print(candidate3.tech_stack)
-print(candidate3.main_skill)
-print(candidate3.main_skill_grade)
+# candidate3 = Candidate.generate_candidates('candidates.csv')
+# print(candidate3.fist_name)
+# print(candidate3.last_name)
+# print(candidate3.email)
+# print(candidate3.tech_stack)
+# print(candidate3.main_skill)
+# print(candidate3.main_skill_grade)
