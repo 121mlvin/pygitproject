@@ -1,5 +1,6 @@
 import traceback
 import urllib.request
+from pathlib import Path
 from datetime import datetime
 from exceptions import EmailAlreadyExistsException
 
@@ -43,6 +44,9 @@ class Employee:
     @staticmethod
     def validate(email):
         current_date = datetime.now()
+        file = Path('emails.csv')
+        if not file.is_file():
+            open('emails.csv', "x")
 
         try:
             with open('emails.csv', 'r') as f:
@@ -137,9 +141,9 @@ class Candidate:
         return candidates
 
 
-# recruiter = Recruiter(name='Max', salary_per_day=700, email='abc@mail')
-# print(recruiter.work())
-# print(recruiter)
+recruiter = Recruiter('Max', 700, 'abc@mail')
+print(recruiter.work())
+print(recruiter)
 #
 # developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000, 'zxc@mail')
 # print(developer_1)
@@ -157,12 +161,12 @@ class Candidate:
 # print(developer_3.tech_stack)
 # print(developer_3.check_salary(12))
 
-candidate1 = Candidate('Masha', 'Abc', 'ma@mail', ['JavaScript'], 'JavaScript', 'Junior')
-print(candidate1.full_name)
+# candidate1 = Candidate('Masha', 'Abc', 'ma@mail', ['JavaScript'], 'JavaScript', 'Junior')
+# print(candidate1.full_name)
 #
-candidate2 = Candidate.generate_candidates(
-    'https://bitbucket.org/ivnukov/lesson2/raw/4f59074e6fbb552398f87636b5bf089a1618da0a/candidates.csv')
-print(candidate2)
+# candidate2 = Candidate.generate_candidates(
+#     'https://bitbucket.org/ivnukov/lesson2/raw/4f59074e6fbb552398f87636b5bf089a1618da0a/candidates.csv')
+# print(candidate2)
 # print(candidate2.last_name)
 # print(candidate2.email)
 # print(candidate2.tech_stack)
