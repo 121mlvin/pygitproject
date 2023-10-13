@@ -1,11 +1,14 @@
 import traceback
 import urllib.request
+import settings
 from pathlib import Path
 from datetime import datetime
 from exceptions import EmailAlreadyExistsException
+from settings import USERS_EMAILS_PATH
 
 
 class Employee:
+
     def __init__(self, name, salary_per_day, email):
         self.name = name
         self.salary_per_day = salary_per_day
@@ -37,32 +40,28 @@ class Employee:
         return f'Amount of money {self.salary_per_day * days} for {days} days' \
                f', and {result} already earned for today {current_datetime.date()}'
 
-    def save_email(self):
-        with open('emails.csv', 'a+') as f:
+    def save_email(self, path=USERS_EMAILS_PATH):
+        with open(path, 'a+') as f:
             f.write(self.email + '\n')
 
     @staticmethod
-    def validate(email):
+    def validate(email, path=USERS_EMAILS_PATH):
         current_date = datetime.now()
-        file = Path('emails.csv')
+        file = Path(path)
         if not file.is_file():
-            open('emails.csv', "x")
+            open(path, "x")
+        with open(path, 'r') as f:
+            if email not in f.read():
+                print('Email saved!')
+                return True
 
-        try:
-            with open('emails.csv', 'r') as f:
-                if email in f.read():
-                    raise EmailAlreadyExistsException
-                else:
-                    print('Email saved!')
-
-        except EmailAlreadyExistsException:
-            print('Email already exists!')
-            with open('logs.txt', 'a+') as logs:
-                logs.write('%' + str(current_date.date()) + '% '
-                           + '%' + str(current_date.time()) + '% | %'
-                           + traceback.format_exc() + '%' + '\n')
-            return False
-        return True
+            else:
+                with open('logs.txt', 'a+') as logs:
+                    logs.write('%' + str(current_date.date()) + '% '
+                               + '%' + str(current_date.time()) + '% | %'
+                               + str(traceback.format_stack()) + '%\n')
+                raise EmailAlreadyExistsException('Email already exists!')
+        return False
 
 
 class Recruiter(Employee):
@@ -129,54 +128,55 @@ class Candidate:
             if 'Full Name' in splited_lines:
                 lines = ''
                 continue
-            name, surname = splited_lines[0].split()
+            name, surname = splited_lines[settings.FULL_NAME].split()
             candidates.append(name)
             candidates.append(surname)
-            candidates.append(splited_lines[1])
-            candidates.append(splited_lines[2].split('|'))
-            candidates.append(splited_lines[3])
-            candidates.append(splited_lines[4][:-1])
+            candidates.append(splited_lines[settings.EMAIL])
+            candidates.append(splited_lines[settings.TECH_STACK].split('|'))
+            candidates.append(splited_lines[settings.MAIN_SKILL])
+            candidates.append(splited_lines[settings.MAIN_SKILL_GRADE][:-1])
             lines = ''
 
         return candidates
 
 
-recruiter = Recruiter('Max', 700, 'abc@mail')
-print(recruiter.work())
-print(recruiter)
-#
-# developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000, 'zxc@mail')
-# print(developer_1)
-# print(developer_1 > recruiter)
-# print(developer_1.check_salary(22))
-#
-# developer_2 = Developer(['JavaScript', 'Django', 'Linux'], 'Vasya', 1200, 'skrpow@mail')
-# print(developer_2)
-# print(developer_2 > developer_1)
-# print(developer_2.check_salary(22))
-#
-# developer_3 = developer_2 + developer_1
-# print(developer_3.salary_per_day)
-# print(developer_3.name)
-# print(developer_3.tech_stack)
-# print(developer_3.check_salary(12))
+if __name__ == '__main__':
+    recruiter = Recruiter('Max', 700, 'abc@mail')
+    print(recruiter.work())
+    print(recruiter)
+    #
+    # developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000, 'zxc@mail')
+    # print(developer_1)
+    # print(developer_1 > recruiter)
+    # print(developer_1.check_salary(22))
+    #
+    # developer_2 = Developer(['JavaScript', 'Django', 'Linux'], 'Vasya', 1200, 'skrpow@mail')
+    # print(developer_2)
+    # print(developer_2 > developer_1)
+    # print(developer_2.check_salary(22))
+    #
+    # developer_3 = developer_2 + developer_1
+    # print(developer_3.salary_per_day)
+    # print(developer_3.name)
+    # print(developer_3.tech_stack)
+    # print(developer_3.check_salary(12))
 
-# candidate1 = Candidate('Masha', 'Abc', 'ma@mail', ['JavaScript'], 'JavaScript', 'Junior')
-# print(candidate1.full_name)
-#
-# candidate2 = Candidate.generate_candidates(
-#     'https://bitbucket.org/ivnukov/lesson2/raw/4f59074e6fbb552398f87636b5bf089a1618da0a/candidates.csv')
-# print(candidate2)
-# print(candidate2.last_name)
-# print(candidate2.email)
-# print(candidate2.tech_stack)
-# print(candidate2.main_skill)
-# print(candidate2.main_skill_grade)
+    # candidate1 = Candidate('Masha', 'Abc', 'ma@mail', ['JavaScript'], 'JavaScript', 'Junior')
+    # print(candidate1.full_name)
+    #
+    # candidate2 = Candidate.generate_candidates(
+    #     'https://bitbucket.org/ivnukov/lesson2/raw/4f59074e6fbb552398f87636b5bf089a1618da0a/candidates.csv')
+    # print(candidate2)
+    # print(candidate2.last_name)
+    # print(candidate2.email)
+    # print(candidate2.tech_stack)
+    # print(candidate2.main_skill)
+    # print(candidate2.main_skill_grade)
 
-# candidate3 = Candidate.generate_candidates('candidates.csv')
-# print(candidate3.fist_name)
-# print(candidate3.last_name)
-# print(candidate3.email)
-# print(candidate3.tech_stack)
-# print(candidate3.main_skill)
-# print(candidate3.main_skill_grade)
+    # candidate3 = Candidate.generate_candidates('candidates.csv')
+    # print(candidate3.fist_name)
+    # print(candidate3.last_name)
+    # print(candidate3.email)
+    # print(candidate3.tech_stack)
+    # print(candidate3.main_skill)
+    # print(candidate3.main_skill_grade)
