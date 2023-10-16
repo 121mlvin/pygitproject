@@ -1,4 +1,6 @@
 USERS_EMAILS_PATH = 'emails.csv'
+LOGGS_FILE_PATH = 'error-logs.csv'
+FILE_NAME = ''
 FULL_NAME = 0
 EMAIL = 1
 TECH_STACK = 2

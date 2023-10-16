@@ -140,10 +140,48 @@ class Candidate:
         return candidates
 
 
+class Writer:
+    @staticmethod
+    def write(message: str):
+        with open(settings.LOGGS_FILE_PATH, 'a+') as f:
+            f.write(message + '\n')
+
+
+class Logger:
+    @staticmethod
+    def write(exep):
+        with open(settings.LOGGS_FILE_PATH, 'r+') as f:
+            todays_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            Writer.write(f'{str(len(f.readlines()) + 1)} {todays_date} {exep.__class__.__name__} {str(exep)}')
+
+
+def logger(logger):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                result = func(args, kwargs)
+                return result
+            except Exception as e:
+                logger.write(e)
+
+        return wrapper
+
+    return decorator
+
+
 if __name__ == '__main__':
-    recruiter = Recruiter('Max', 700, 'abc@mail')
-    print(recruiter.work())
-    print(recruiter)
+    logger1 = Logger()
+
+
+    @logger(logger1)
+    def function1():
+        a = 1
+        b = 0
+        return a / b
+
+    # recruiter = Recruiter('Max', 700, 'abc@mail')
+    # print(recruiter.work())
+    # print(recruiter)
     #
     # developer_1 = Developer(['JavaScript', 'Django'], 'Ivan', 1000, 'zxc@mail')
     # print(developer_1)
